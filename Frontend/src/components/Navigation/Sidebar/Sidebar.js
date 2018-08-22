@@ -1,23 +1,33 @@
-import React from 'react';
+import React,{Component} from 'react';
 import classes from './Sidebar.css';
 import NavItem from "../NavItem/NavItem";
+import {connect} from "react-redux";
+import * as actionCreators from "../../../store/actions";
 
-const sidebar =()=>{
+class Sidebar extends Component{
 
-    const items=["Customer","Item","Place-Order","Orders"];
+    render(){
+        const items=["Customer","Item","Place-Order","Orders"];
 
-    const navItems=items.map((item,index)=>(
-        <div key={index} className={classes.Item}>
-            &nbsp;
-            &nbsp;
-            <NavItem link={"/"+item}>{"  "+item+"  "}</NavItem>
-        </div>
-    ))
-    return(
-        <div className={classes.Sidebar}>
-            {navItems}
-        </div>
-    );
+        const navItems=items.map((item,index)=>(
+            <div onClick={()=>this.props.drawerOnClose()} key={index} className={classes.Item}>
+                &nbsp;
+                &nbsp;
+                <NavItem link={"/"+item}>{"  "+item+"  "}</NavItem>
+            </div>
+        ))
+        return(
+            <div className={classes.Sidebar}>
+                {navItems}
+            </div>
+        );
+    }
 }
 
-export default sidebar;
+const mapDispatchToProps=(dispatch)=>{
+    return{
+        drawerOnClose:()=>dispatch(actionCreators.closeDrawer())
+    }
+}
+
+export default connect(null,mapDispatchToProps)(Sidebar);

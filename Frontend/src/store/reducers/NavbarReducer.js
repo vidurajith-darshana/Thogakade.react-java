@@ -5,7 +5,7 @@ const initialState={
 };
 
 const reducer=(state=initialState,action)=>{
-    switch (actionTypes) {
+    switch (action.type) {
 
         case actionTypes.DRAWER_OPEN:
             return{

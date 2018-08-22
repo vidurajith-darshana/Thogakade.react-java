@@ -1,16 +1,30 @@
 import React, { Component } from 'react';
-import Navbar from "./components/Navigation/Navbar/Navbar";
-import SideDrawer from './components/Navigation/SideDrawer/SideDrawer';
 import Backdrop from "./components/Backdrop/Backdrop";
 import {connect} from "react-redux";
+import Navigation from "./components/Navigation/Navigation";
+import {Route, Switch, withRouter} from "react-router-dom";
+import Async from 'react-code-splitting'
+import classes from './App.css';
+
+const CustomerForm = () => <Async load={import('./containers/CustomerForm/CustomerForm')} />
+const PlaceOrderForm = () => <Async load={import('./containers/PlaceOrderForm/PlaceOrderForm')} />
+const OrdersForm = () => <Async load={import('./containers/OrdersForm/OrdersForm')} />
+const ItemForm = () => <Async load={import('./containers/ItemForm/ItemForm')} />
 
 class App extends Component {
     render () {
         return (
             <div>
-                <Navbar/>
-                <SideDrawer/>
                 <Backdrop show={this.props.openDrawer}/>
+                <Navigation/>
+                <div className="col-sm-12" style={{position:'absolute',marginTop:'100px'}}>
+                    <Switch>
+                        <Route path="/Customer" component={CustomerForm} />
+                        <Route path="/Item" component={ItemForm} />
+                        <Route path="/Place-Order" component={PlaceOrderForm} />
+                        <Route path="/Orders" component={OrdersForm} />
+                    </Switch>
+                </div>
             </div>
         );
     }
@@ -22,4 +36,4 @@ const mapDispatchToProps=(state)=>{
     }
 }
 
-export default connect(mapDispatchToProps,null)(App);
+export default withRouter(connect(mapDispatchToProps,null)(App));

@@ -9,8 +9,8 @@ class Navbar extends Component{
         return(
             <div className={classes.Navbar}>
                 <Logo/>
-                <Toolbar />
                 <ToggleButton/>
+                <Toolbar />
             </div>
         )
     }

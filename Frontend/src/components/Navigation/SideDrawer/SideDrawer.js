@@ -6,8 +6,9 @@ import {connect} from "react-redux";
 class SideDrawer extends Component{
 
     render(){
+        console.log("side drawer "+this.props.drawerIsOpen)
         return(
-            <div className={this.props.drawerIsOpen?classes.SideDrawer:classes.Close}>
+            <div className={this.props.drawerIsOpen?classes.Open:classes.Close}>
                 <Sidebar />
             </div>
         );
