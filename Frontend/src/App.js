@@ -17,7 +17,7 @@ class App extends Component {
             <div>
                 <Backdrop show={this.props.openDrawer}/>
                 <Navigation/>
-                <div className="col-sm-12" style={{position:'absolute',marginTop:'100px'}}>
+                <div className="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12" style={{position:'absolute',marginTop:'100px'}}>
                     <Switch>
                         <Route path="/Customer" component={CustomerForm} />
                         <Route path="/Item" component={ItemForm} />

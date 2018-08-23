@@ -1,0 +1,39 @@
+.Container{
+    width: 100%;
+    height: 500px;
+}
+
+.Add{
+    width: 100%;
+    background-color: white;
+    border-radius: 5px;
+    border:1px solid lightgray;
+    box-shadow: 1px 1px 1px lightgray;
+}
+.Add h5{
+    margin-top: 2%;
+}
+
+.Search{
+    margin-top: 15px;
+    background-color: white;
+    border-radius: 5px;
+    border:1px solid lightgray;
+    box-shadow: 1px 1px 1px lightgray;
+    width: 100%;
+}
+
+.Cards{
+    width:100%;
+    background-color: white;
+    border-radius: 5px;
+    border:1px solid lightgray;
+    box-shadow: 1px 1px 1px lightgray;
+}
+
+@media only screen and (max-width: 767px) {
+
+    .Cards{
+        margin-top: 15px;
+    }
+}
