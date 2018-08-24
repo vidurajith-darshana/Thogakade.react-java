@@ -31,11 +31,11 @@ class CustomerForm extends Component{
 
     render(){
         let count=0;
-        const cards=this.state.customers.map(customer=>{
+        const cards=this.state.customers.map((customer,index)=>{
             count++;
             if(this.state.customers.length===count){
                 return(
-                    <div style={{marginTop:'2%',marginBottom:'2%'}} className="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                    <div key={index} style={{marginTop:'2%',marginBottom:'2%'}} className="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
                         <div className="w3-card-4" style={{width:'90%',marginLeft:'6%'}}>
                             <img width="100%" src="https://www.w3schools.com/w3css/img_snowtops.jpg" alt="Norway"/>
                             <div style={{display:'flex',flexDirection:'column',justifyContent:'flex-start'}} className="w3-container w3-center">
@@ -55,7 +55,7 @@ class CustomerForm extends Component{
                 )
             }else{
                 return(
-                    <div style={{marginTop:'2%'}} className="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                    <div key={index} style={{marginTop:'2%'}} className="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
                         <div className="w3-card-4" style={{width:'90%',marginLeft:'6%'}}>
                             <img width="100%" src="https://www.w3schools.com/w3css/img_snowtops.jpg" alt="Norway"/>
                             <div style={{display:'flex',flexDirection:'column',justifyContent:'flex-start'}} className="w3-container w3-center">

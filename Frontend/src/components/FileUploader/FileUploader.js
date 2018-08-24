@@ -2,6 +2,7 @@ import { Upload, Icon, Modal } from 'antd';
 import React,{Component} from 'react';
 import {connect} from "react-redux";
 import * as actionCreators from '../../store/actions/index';
+import axios from '../../axios/axios-customer';
 
 class PicturesWall extends Component {
     state = {
@@ -27,6 +28,15 @@ class PicturesWall extends Component {
             previewVisible: true,
         });
     };
+
+    dataURLtoFile=(dataurl, filename)=> {
+        let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+        while(n--){
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new File([u8arr], filename, {type:mime});
+    }
 
     // change the images
 
@@ -59,6 +69,19 @@ class PicturesWall extends Component {
         this.setState({
             fileList:updateFileList
         })
+
+        const bodyFormData=new FormData();
+        bodyFormData.set("file",fileList[0].originFileObj);
+
+        axios.post(`/customer`,bodyFormData)
+            .then(response => {
+                console.log(response.data)
+            })
+
+            .catch(error => {
+                console.log("error: " + error)
+            });
+
 
     }
 
