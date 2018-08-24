@@ -6,10 +6,13 @@ import thunk from 'redux-thunk';
 import {applyMiddleware, combineReducers, compose, createStore} from "redux";
 import {Provider} from "react-redux";
 import {BrowserRouter} from "react-router-dom";
+
 import NavbarReducer from './store/reducers/NavbarReducer';
+import UploadeReducer from './store/reducers/UploadReducer';
 
 const rootReducer=combineReducers({
-    navbarRed:NavbarReducer
+    navbarRed:NavbarReducer,
+    uploadRed:UploadeReducer
 });
 
 // make the compose enhacers for redux devtools

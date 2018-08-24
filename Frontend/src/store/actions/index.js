@@ -5,4 +5,10 @@ export{
     openDrawer,
     closeDrawer
 
-} from './NavbarActions'
+} from './NavbarActions';
+
+export{
+    
+    uploadImageOnAction
+
+} from './UploaderActions';

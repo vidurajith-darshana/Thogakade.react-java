@@ -1,6 +1,7 @@
 import React,{Component} from 'react';
 import classes from './CustomerForm.css';
 import Button from '@material-ui/core/Button';
+import FileUploader from "../../components/FileUploader/FileUploader";
 
 const styles = theme => ({
     button: {
@@ -40,7 +41,14 @@ class CustomerForm extends Component{
                             <div style={{display:'flex',flexDirection:'column',justifyContent:'flex-start'}} className="w3-container w3-center">
                                 <p style={{fontWeight:'bold'}}>{customer.name}</p>
                                 <p style={{fontSize:'12px'}}>{customer.address}</p>
-                                <div style={{display:'flex',justifyContent:'space-between'}}></div>
+                                <div className={classes.ButtonRow}>
+                                    <Button style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
+                                        update
+                                    </Button>
+                                    <Button style={{border:'none',outline:'none',fontWeight:'bold'}} color="secondary" className={styles.button}>
+                                        Delete
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -53,6 +61,14 @@ class CustomerForm extends Component{
                             <div style={{display:'flex',flexDirection:'column',justifyContent:'flex-start'}} className="w3-container w3-center">
                                 <p style={{fontWeight:'bold'}}>{customer.name}</p>
                                 <p style={{fontSize:'12px'}}>{customer.address}</p>
+                                <div className={classes.ButtonRow}>
+                                    <Button style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
+                                        update
+                                    </Button>
+                                    <Button style={{border:'none',outline:'none',fontWeight:'bold'}} color="secondary" className={styles.button}>
+                                        Delete
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -83,6 +99,13 @@ class CustomerForm extends Component{
 
                                             <div>Address</div>
                                             <div><input type="text"/></div>
+
+                                        </div>
+
+                                        <div className={classes.AddImage}>
+
+                                            <div>Customer Photo</div>
+                                            <div style={{marginRight:'10%'}}><FileUploader/></div>
 
                                         </div>
 
