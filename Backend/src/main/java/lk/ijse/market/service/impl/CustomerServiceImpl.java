@@ -87,4 +87,14 @@ public class CustomerServiceImpl implements CustomerService {
             throw new RuntimeException("Customer doesn't exist");
         }
     }
+
+    @Override
+    public CustomerDTO getLastCustomer() {
+        if(findAll().size()>0){
+            Customer customer=customerRepository.getLastCustomer();
+            CustomerDTO customerDTO=new CustomerDTO(customer.getId(),customer.getName(),customer.getAddress());
+            return customerDTO;
+        }
+        return null;
+    }
 }

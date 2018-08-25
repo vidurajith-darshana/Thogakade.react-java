@@ -18,4 +18,6 @@ public interface CustomerService {
 
     public boolean deleteCustomer(CustomerDTO customerDTO);
 
+    public CustomerDTO getLastCustomer();
+
 }
