@@ -25,14 +25,14 @@ public class UploadController {
         try{
 
             String orgFileName=file.getOriginalFilename();
-            String[] fileParts = orgFileName.split("\\.(?=[^\\.]+$)");
-            String fileName=(customerService.getLastCustomer().getId()+1)+"."+fileParts[1];
+//            String[] fileParts = orgFileName.split("\\.(?=[^\\.]+$)");
+//            String fileName=(customerService.getLastCustomer().getId()+1)+"."+fileParts[1];
 
-            String path=request.getServletContext().getRealPath("")+UPLOAD_DIR+"/customer"+ File.separator +fileName;
+            String path=request.getServletContext().getRealPath("")+UPLOAD_DIR+"/customer"+ File.separator +orgFileName;
             InputStream inputStream=file.getInputStream();
 
             saveFile(inputStream,path);
-            return fileName;
+            return orgFileName;
 
         }catch(Exception e){
             e.printStackTrace();
@@ -45,14 +45,14 @@ public class UploadController {
         try{
 
             String orgFileName=file.getOriginalFilename();
-            String[] fileParts = orgFileName.split("\\.(?=[^\\.]+$)");
-            String fileName=(customerService.getLastCustomer().getId()+1)+"."+fileParts[1];
+//            String[] fileParts = orgFileName.split("\\.(?=[^\\.]+$)");
+//            String fileName=(customerService.getLastCustomer().getId()+1)+"."+fileParts[1];
 
-            String path=request.getServletContext().getRealPath("")+UPLOAD_DIR+"/item"+ File.separator +fileName;
+            String path=request.getServletContext().getRealPath("")+UPLOAD_DIR+"/item"+ File.separator +orgFileName;
             InputStream inputStream=file.getInputStream();
 
             saveFile(inputStream,path);
-            return fileName;
+            return orgFileName;
 
         }catch(Exception e){
             e.printStackTrace();

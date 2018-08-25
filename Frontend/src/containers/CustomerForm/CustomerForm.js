@@ -2,6 +2,12 @@ import React,{Component} from 'react';
 import classes from './CustomerForm.css';
 import Button from '@material-ui/core/Button';
 import FileUploader from "../../components/FileUploader/FileUploader";
+import axiosCustomer from '../../axios/axios-customer';
+import axiosUpload from '../../axios/axios-upload';
+
+import {Modal} from "antd";
+import {connect} from "react-redux";
+import * as actionCreators from "../../store/actions";
 
 const styles = theme => ({
     button: {
@@ -15,6 +21,8 @@ const styles = theme => ({
     },
 });
 
+const globalImagePath="http://localhost:8080/images/customer/"
+
 class CustomerForm extends Component{
 
     state={
@@ -26,10 +34,77 @@ class CustomerForm extends Component{
             {id:5,name:"Janitha Dananjaya",address:"223/2,Ingiriya,Horana"},
             {id:6,name:"Binura Salindra",address:"No:23,Deniyaya,Mathara"},
             {id:7,name:"Reshan Maduka",address:"Imaduwa,Galle"}
-        ]
+        ],
+        visible:false,
+        name:'',
+        address:''
+    }
+
+    showModal = () => {
+        this.setState({
+            visible: true,
+        });
+    }
+
+    handleOk = (e) => {
+        console.log(e);
+        this.setState({
+            visible: false,
+        });
+    }
+
+    handleCancel = (e) => {
+        console.log(e);
+        this.setState({
+            visible: false,
+        });
+    }
+
+    // save customer function
+
+    saveCustomer=()=>{
+
+        const bodyFormData=new FormData();
+        bodyFormData.set("file",this.props.imgFile[0].originFileObj);
+
+        axiosUpload.post(`/customer`,bodyFormData)
+            .then(response => {
+                if(response.data.StatusCode!==500){
+                    const customerObj={
+                        id:0,
+                        name:this.state.name,
+                        address:this.state.address,
+                        image:response.data
+                    }
+                    axiosCustomer.put(`/customer`,customerObj)
+                        .then(response => {
+                            if(response.data){
+                                this.props.onHandleImageFiles([]);
+                                this.setState({
+                                    name:'',
+                                    address:''
+                                })
+                            }else{
+                                alert("fail!");
+                            }
+                        })
+
+                        .catch(error => {
+                            console.log("error: " + error)
+                        });
+                }
+            })
+
+            .catch(error => {
+                console.log("error: " + error)
+            });
+
     }
 
     render(){
+
+        const { fullScreen } = this.props;
+
         let count=0;
         const cards=this.state.customers.map((customer,index)=>{
             count++;
@@ -42,7 +117,7 @@ class CustomerForm extends Component{
                                 <p style={{fontWeight:'bold'}}>{customer.name}</p>
                                 <p style={{fontSize:'12px'}}>{customer.address}</p>
                                 <div className={classes.ButtonRow}>
-                                    <Button style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
+                                    <Button onClick={this.showModal} style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
                                         update
                                     </Button>
                                     <Button style={{border:'none',outline:'none',fontWeight:'bold'}} color="secondary" className={styles.button}>
@@ -62,7 +137,7 @@ class CustomerForm extends Component{
                                 <p style={{fontWeight:'bold'}}>{customer.name}</p>
                                 <p style={{fontSize:'12px'}}>{customer.address}</p>
                                 <div className={classes.ButtonRow}>
-                                    <Button style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
+                                    <Button onClick={this.showModal} style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
                                         update
                                     </Button>
                                     <Button style={{border:'none',outline:'none',fontWeight:'bold'}} color="secondary" className={styles.button}>
@@ -78,9 +153,45 @@ class CustomerForm extends Component{
 
         const cardSet=<div className="row">{cards}</div>
 
+        const updateForm=<Modal
+            title="Update Customer"
+            footer={null}
+            visible={this.state.visible}
+            onOk={this.handleOk}
+            onCancel={this.handleCancel}
+        >
+            <div className={classes.AddImage}>
+
+                <FileUploader/>
+
+            </div>
+
+            <div className={classes.AddName}>
+
+                <div>Name</div>
+                <div><input type="text" style={{marginLeft:'-2%'}}/></div>
+
+            </div>
+
+            <div className={classes.AddAddress}>
+
+                <div>Address</div>
+                <div><input type="text"/></div>
+
+            </div>
+
+            <div className={classes.updateDiv}>
+                <Button style={{border:'none',outline:'none'}} color="primary" className={styles.button}>
+                    Update Customer
+                </Button>
+
+            </div>
+        </Modal>;
+
         return(
 
             <div className={classes.Container}>
+                {updateForm}
                 <div className="row">
                     <div className="col-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
                         <div className="row" style={{marginLeft:'0px',marginRight:'0px'}}>
@@ -88,29 +199,29 @@ class CustomerForm extends Component{
                                 <div className={classes.AddContainer}>
                                     <h5>Add New Customer</h5>
                                     <div className="w3-panel w3-card-2" style={{marginBottom:'10%',width:'95%',display:'flex',flexDirection:'column',justifyContent:'flex-start'}}>
+
+                                        <div className={classes.AddImage}>
+
+                                            <FileUploader/>
+
+                                        </div>
+
                                         <div className={classes.AddName}>
 
                                             <div>Name</div>
-                                            <div><input type="text"/></div>
+                                            <div><input value={this.state.name} onChange={(event)=>this.setState({name:event.target.value})} type="text"/></div>
 
                                         </div>
 
                                         <div className={classes.AddAddress}>
 
                                             <div>Address</div>
-                                            <div><input type="text"/></div>
-
-                                        </div>
-
-                                        <div className={classes.AddImage}>
-
-                                            <div>Customer Photo</div>
-                                            <div style={{marginRight:'10%'}}><FileUploader/></div>
+                                            <div><input value={this.state.address} onChange={(event)=>this.setState({address:event.target.value})} type="text"/></div>
 
                                         </div>
 
                                         <div className={classes.saveDiv}>
-                                            <Button style={{border:'none',outline:'none'}} color="primary" className={styles.button}>
+                                            <Button onClick={this.saveCustomer} style={{border:'none',outline:'none'}} color="primary" className={styles.button}>
                                                 Save Customer
                                             </Button>
 
@@ -155,4 +266,16 @@ class CustomerForm extends Component{
     }
 }
 
-export default CustomerForm;
+const mapStateToProps=(state)=>{
+    return{
+        imgFile:state.uploadRed.imageFile,
+    }
+}
+
+const mapDispatchToProps=(dispatch)=>{
+    return{
+        onHandleImageFiles:(data)=>dispatch(actionCreators.uploadImageOnAction(data)),
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(CustomerForm);

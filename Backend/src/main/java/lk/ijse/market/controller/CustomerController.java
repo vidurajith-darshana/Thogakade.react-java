@@ -38,6 +38,7 @@ public class CustomerController {
                 case "all":return customerService.findAll();
                 case "search":return customerService.findById(id);
                 case "page":return customerService.findByPage(page,size);
+                case "last":return customerService.getLastCustomer();
                 default:return customerService.findAll();
             }
         }else{

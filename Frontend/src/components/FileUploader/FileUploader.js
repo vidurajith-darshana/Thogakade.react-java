@@ -43,7 +43,7 @@ class PicturesWall extends Component {
     handleChange = ({ fileList }) => {
 
         const updateFileList=[];
-        fileList.map((file,index)=>{
+        fileList.map(file=>{
             const myFile=file;
 
             if(myFile.thumbUrl==='' || myFile.thumbUrl===null){
@@ -59,7 +59,6 @@ class PicturesWall extends Component {
                 updateFileList.push(myFile);
             }
         })
-        this.props.onHandleImageFiles(updateFileList);
 
         let totalSize=0;
 
@@ -70,25 +69,24 @@ class PicturesWall extends Component {
             fileList:updateFileList
         })
 
-        const bodyFormData=new FormData();
-        bodyFormData.set("file",fileList[0].originFileObj);
-
-        axios.post(`/customer`,bodyFormData)
-            .then(response => {
-                console.log(response.data)
-            })
-
-            .catch(error => {
-                console.log("error: " + error)
-            });
-
+        this.props.onHandleImageFiles(updateFileList);
 
     }
 
     // if there are any image all are show its first time
 
     componentDidMount(){
+        if(this.props.images.length>0){
+            this.setState({
+                fileList:this.props.images
+            })
+        }
+    }
 
+    componentDidUpdate(){
+        this.setState({
+            fileList:this.props.images
+        })
     }
 
 

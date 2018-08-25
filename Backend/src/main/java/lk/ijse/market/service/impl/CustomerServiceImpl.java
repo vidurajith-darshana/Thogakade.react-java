@@ -23,23 +23,19 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean saveCustomer(CustomerDTO customerDTO) {
-        customerRepository.save(new Customer(0,customerDTO.getName(),customerDTO.getAddress()));
+        customerRepository.save(new Customer(0,customerDTO.getName(),customerDTO.getAddress(),customerDTO.getImage()));
         return true;
     }
 
     @Override
     public List<CustomerDTO> findAll() {
-        if(customerRepository.existsById(1)){
-            List<Customer> customerList=customerRepository.findAll();
-            List<CustomerDTO> list=new ArrayList<>();
-            customerList.forEach(customer->{
-                list.add(new CustomerDTO(customer.getId(),customer.getName(),customer.getAddress()));
-            });
+        List<Customer> customerList=customerRepository.findAll();
+        List<CustomerDTO> list=new ArrayList<>();
+        customerList.forEach(customer->{
+            list.add(new CustomerDTO(customer.getId(),customer.getName(),customer.getAddress(),customer.getImage()));
+        });
 
-            return list;
-        }else{
-            throw new RuntimeException("customers are not exist");
-        }
+        return list;
 
     }
 
@@ -47,7 +43,7 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerDTO findById(int id) {
         if(customerRepository.existsById(id)){
             Customer customer=customerRepository.findById(id).get();
-            return new CustomerDTO(customer.getId(),customer.getName(),customer.getAddress());
+            return new CustomerDTO(customer.getId(),customer.getName(),customer.getAddress(),customer.getImage());
         }else{
             throw new RuntimeException("Customer doesn't exist");
         }
@@ -58,7 +54,7 @@ public class CustomerServiceImpl implements CustomerService {
         List<Customer> customerList=customerRepository.findAll(PageRequest.of(page,size)).getContent();
         List<CustomerDTO> list=new ArrayList<>();
         customerList.forEach(customer->{
-            list.add(new CustomerDTO(customer.getId(),customer.getName(),customer.getAddress()));
+            list.add(new CustomerDTO(customer.getId(),customer.getName(),customer.getAddress(),customer.getImage()));
         });
 
         return list;
@@ -70,7 +66,7 @@ public class CustomerServiceImpl implements CustomerService {
     public boolean updateCustomer(CustomerDTO customerDTO) {
 
         if(customerRepository.existsById(customerDTO.getId())){
-            customerRepository.save(new Customer(customerDTO.getId(),customerDTO.getName(),customerDTO.getAddress()));
+            customerRepository.save(new Customer(customerDTO.getId(),customerDTO.getName(),customerDTO.getAddress(),customerDTO.getImage()));
             return true;
         }else{
             throw new RuntimeException("Customer doesn't exist");
@@ -81,7 +77,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean deleteCustomer(CustomerDTO customerDTO) {
         if(customerRepository.existsById(customerDTO.getId())){
-            customerRepository.delete(new Customer(customerDTO.getId(),customerDTO.getName(),customerDTO.getAddress()));
+            customerRepository.delete(new Customer(customerDTO.getId(),customerDTO.getName(),customerDTO.getAddress(),customerDTO.getImage()));
             return true;
         }else{
             throw new RuntimeException("Customer doesn't exist");
@@ -90,11 +86,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDTO getLastCustomer() {
-        if(findAll().size()>0){
-            Customer customer=customerRepository.getLastCustomer();
-            CustomerDTO customerDTO=new CustomerDTO(customer.getId(),customer.getName(),customer.getAddress());
-            return customerDTO;
-        }
-        return null;
+        Customer customer=customerRepository.getLastCustomer();
+        CustomerDTO customerDTO=new CustomerDTO(customer.getId(),customer.getName(),customer.getAddress(),customer.getImage());
+        return customerDTO;
     }
 }

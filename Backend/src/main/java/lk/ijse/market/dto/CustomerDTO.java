@@ -5,14 +5,16 @@ public class CustomerDTO {
     private int id;
     private String name;
     private String address;
+    private String image;
 
-    public CustomerDTO() {
-    }
-
-    public CustomerDTO(int id, String name, String address) {
+    public CustomerDTO(int id, String name, String address, String image) {
         this.id = id;
         this.name = name;
         this.address = address;
+        this.image = image;
+    }
+
+    public CustomerDTO() {
     }
 
     public int getId() {
@@ -39,12 +41,21 @@ public class CustomerDTO {
         this.address = address;
     }
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     @Override
     public String toString() {
         return "CustomerDTO{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", address='" + address + '\'' +
+                ", image='" + image + '\'' +
                 '}';
     }
 }

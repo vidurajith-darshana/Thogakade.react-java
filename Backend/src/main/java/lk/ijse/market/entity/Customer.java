@@ -11,19 +11,22 @@ public class Customer {
     private int id;
     private String name;
     private String address;
+    private String image;
 
     public Customer() {
     }
 
-    public Customer(int id,String name, String address) {
+    public Customer(int id,String name, String address,String image) {
         this.id=id;
         this.name = name;
         this.address = address;
+        this.image=image;
     }
 
-    public Customer(String name, String address) {
+    public Customer(String name, String address,String image) {
         this.name = name;
         this.address = address;
+        this.image=image;
     }
 
     public int getId() {
@@ -50,12 +53,21 @@ public class Customer {
         this.address = address;
     }
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     @Override
     public String toString() {
         return "Customer{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", address='" + address + '\'' +
+                ", image='" + image + '\'' +
                 '}';
     }
 }
