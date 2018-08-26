@@ -36,7 +36,10 @@ class CustomerForm extends Component{
         beforeSearch:''
     }
 
-    showModal = () => {
+    showModal = (url) => {
+        this.getBase64Image(url, (base64image)=>{
+            console.log(base64image);
+        });
         this.setState({
             visible: true,
         });
@@ -54,6 +57,32 @@ class CustomerForm extends Component{
         this.setState({
             visible: false,
         });
+    }
+
+    getBase64Image=(imgUrl, callback)=>{
+
+        const img = new Image();
+
+        // onload fires when the image is fully loadded, and has width and height
+
+        img.onload = ()=>{
+
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+            const dataURL = canvas.toDataURL("image/png");
+            const base64 = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+
+            callback(base64); // the base64 string
+
+        };
+
+        // set attributes and src
+        img.setAttribute('crossOrigin', 'http://localhost:8081'); //
+        img.src = imgUrl;
+
     }
 
     loadCards=(pageNumber)=>{
@@ -120,6 +149,13 @@ class CustomerForm extends Component{
                     this.setState({
                         customers:customerList
                     })
+                    const elementName=""+response.data.id;
+                    Scroll.scroller.scrollTo(elementName, {
+                        duration: 1000,
+                        smooth: true,
+                        containerId: 'cardDiv',
+                        offset: -120
+                    })
                     this.props.done();
                 }
             })
@@ -152,6 +188,29 @@ class CustomerForm extends Component{
             currentPage:pageNo
         })
 
+    }
+
+    deleteCustomer=(customerObj)=>{
+        this.props.open();
+        
+        axiosCustomer.delete(`/customer`,{data:customerObj})
+            .then(response => {
+                if(response.data){
+                    const customerList=this.state.customers;
+                    customerList.splice(customerList.indexOf(customerObj),1);
+                    this.setState({
+                        customers:customerList
+                    })
+                    this.props.done();
+                }else{
+                    this.props.error();
+                }
+            })
+
+            .catch(error => {
+                this.props.error();
+                console.log("error: " + error)
+            });
     }
 
     // save customer function
@@ -266,10 +325,10 @@ class CustomerForm extends Component{
                                     <p style={{fontWeight:'bold',fontSize:'13px'}}>{customer.name}</p>
                                     <p style={{fontSize:'12px'}}>{customer.address}</p>
                                     <div className={classes.ButtonRow}>
-                                        <Button onClick={this.showModal} style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
+                                        <Button onClick={()=>this.showModal(globalImagePath+""+customer.image)} style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
                                             update
                                         </Button>
-                                        <Button style={{border:'none',outline:'none',fontWeight:'bold'}} color="secondary" className={styles.button}>
+                                        <Button onClick={()=>this.deleteCustomer(customer)} style={{border:'none',outline:'none',fontWeight:'bold'}} color="secondary" className={styles.button}>
                                             Delete
                                         </Button>
                                     </div>
@@ -288,10 +347,10 @@ class CustomerForm extends Component{
                                     <p style={{fontWeight:'bold',fontSize:'13px'}}>{customer.name}</p>
                                     <p style={{fontSize:'12px'}}>{customer.address}</p>
                                     <div className={classes.ButtonRow}>
-                                        <Button onClick={this.showModal} style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
+                                        <Button onClick={()=>this.showModal(globalImagePath+""+customer.image)} style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
                                             update
                                         </Button>
-                                        <Button style={{border:'none',outline:'none',fontWeight:'bold'}} color="secondary" className={styles.button}>
+                                        <Button onClick={()=>this.deleteCustomer(customer)} style={{border:'none',outline:'none',fontWeight:'bold'}} color="secondary" className={styles.button}>
                                             Delete
                                         </Button>
                                     </div>

@@ -17,9 +17,6 @@ public class UploadController {
 
     private static String UPLOAD_DIR="WEB-INF/images";
 
-    @Autowired
-    private CustomerService customerService;
-
     @PostMapping("/customer")
     public String uploadCustomerPhoto(@RequestParam("file") MultipartFile file, HttpServletRequest request){
         try{
