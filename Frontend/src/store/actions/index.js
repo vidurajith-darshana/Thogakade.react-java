@@ -12,3 +12,13 @@ export{
     uploadImageOnAction
 
 } from './UploaderActions';
+
+export{
+
+    loaderClose,
+    loaderDone,
+    loaderError,
+    loaderLoad,
+    loaderOpen
+
+} from './LoaderActions';

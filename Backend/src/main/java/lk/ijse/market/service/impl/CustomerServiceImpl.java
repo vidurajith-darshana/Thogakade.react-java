@@ -29,13 +29,17 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<CustomerDTO> findAll() {
-        List<Customer> customerList=customerRepository.findAll();
-        List<CustomerDTO> list=new ArrayList<>();
-        customerList.forEach(customer->{
-            list.add(new CustomerDTO(customer.getId(),customer.getName(),customer.getAddress(),customer.getImage()));
-        });
+        try{
+            List<Customer> customerList=customerRepository.findAll();
+            List<CustomerDTO> list=new ArrayList<>();
+            customerList.forEach(customer->{
+                list.add(new CustomerDTO(customer.getId(),customer.getName(),customer.getAddress(),customer.getImage()));
+            });
 
-        return list;
+            return list;
+        }catch(Exception ex){
+            return null;
+        }
 
     }
 
@@ -51,13 +55,17 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<CustomerDTO> findByPage(int page, int size) {
-        List<Customer> customerList=customerRepository.findAll(PageRequest.of(page,size)).getContent();
-        List<CustomerDTO> list=new ArrayList<>();
-        customerList.forEach(customer->{
-            list.add(new CustomerDTO(customer.getId(),customer.getName(),customer.getAddress(),customer.getImage()));
-        });
+        try{
+            List<Customer> customerList=customerRepository.findAll(PageRequest.of(page,size)).getContent();
+            List<CustomerDTO> list=new ArrayList<>();
+            customerList.forEach(customer->{
+                list.add(new CustomerDTO(customer.getId(),customer.getName(),customer.getAddress(),customer.getImage()));
+            });
 
-        return list;
+            return list;
+        }catch(Exception ex){
+            return null;
+        }
 
     }
 

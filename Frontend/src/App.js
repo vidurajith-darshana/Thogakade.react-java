@@ -5,6 +5,7 @@ import Navigation from "./components/Navigation/Navigation";
 import {Route, Switch, withRouter} from "react-router-dom";
 import Async from 'react-code-splitting'
 import classes from './App.css';
+import Loader from "./components/Loader/Loader";
 
 const CustomerForm = () => <Async load={import('./containers/CustomerForm/CustomerForm')} />
 const PlaceOrderForm = () => <Async load={import('./containers/PlaceOrderForm/PlaceOrderForm')} />
@@ -16,6 +17,7 @@ class App extends Component {
         return (
             <div>
                 <Backdrop show={this.props.openDrawer}/>
+                <Loader/>
                 <Navigation/>
                 <div className="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12" style={{position:'absolute',marginTop:'100px'}}>
                     <Switch>

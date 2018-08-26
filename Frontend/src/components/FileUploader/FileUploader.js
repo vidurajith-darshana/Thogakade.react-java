@@ -83,13 +83,6 @@ class PicturesWall extends Component {
         }
     }
 
-    componentDidUpdate(){
-        this.setState({
-            fileList:this.props.images
-        })
-    }
-
-
     render() {
 
         const { previewVisible, previewImage, fileList } = this.state;

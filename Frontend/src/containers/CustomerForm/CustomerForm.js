@@ -4,6 +4,7 @@ import Button from '@material-ui/core/Button';
 import FileUploader from "../../components/FileUploader/FileUploader";
 import axiosCustomer from '../../axios/axios-customer';
 import axiosUpload from '../../axios/axios-upload';
+import * as Scroll from 'react-scroll';
 
 import {Modal} from "antd";
 import {connect} from "react-redux";
@@ -26,18 +27,13 @@ const globalImagePath="http://localhost:8080/images/customer/"
 class CustomerForm extends Component{
 
     state={
-        customers:[
-            {id:1,name:"Vidurajith Darshana",address:"197/3,Temple Road, Kalutara North"},
-            {id:2,name:"Tharindu Athukorala",address:"85/3,Koholana,Surupita"},
-            {id:3,name:"Sandun Dilhan",address:"No:45/3,Hettimulla,Beruwala"},
-            {id:4,name:"Denver Simonsz",address:"Wellatha,Bandaragama"},
-            {id:5,name:"Janitha Dananjaya",address:"223/2,Ingiriya,Horana"},
-            {id:6,name:"Binura Salindra",address:"No:23,Deniyaya,Mathara"},
-            {id:7,name:"Reshan Maduka",address:"Imaduwa,Galle"}
-        ],
+        customers:[],
         visible:false,
         name:'',
-        address:''
+        address:'',
+        searchText:'',
+        pages:0,
+        beforeSearch:''
     }
 
     showModal = () => {
@@ -60,10 +56,113 @@ class CustomerForm extends Component{
         });
     }
 
+    loadCards=(pageNumber)=>{
+        this.props.open();
+
+        axiosCustomer.get(`/customer?action=page&page=`+pageNumber+`&size=12`)
+            .then(response => {
+                if(response.data!==null){
+                    const customerList=this.state.customers;
+                    if(customerList.length===0){
+                        response.data.map(customer=>{
+                            customerList.push({
+                                id:customer.id,
+                                name:customer.name,
+                                address:customer.address,
+                                image:customer.image
+                            })
+                        })
+                    }else{
+                        response.data.map(customer=>{
+                            let count=0;
+                            this.state.customers.map(exist=>{
+                                if(exist.id===customer.id){
+                                    count++;
+                                }
+                            })
+                            if(count===0){
+                                customerList.push({
+                                    id:customer.id,
+                                    name:customer.name,
+                                    address:customer.address,
+                                    image:customer.image
+                                })
+                            }
+
+                        })
+                    }
+                    this.setState({
+                        customers:customerList
+                    })
+                    this.props.close();
+                }
+            })
+
+            .catch(error => {
+                this.props.error();
+                console.log("error: " + error)
+            });
+    }
+
+    loadLastCard=()=>{
+        this.props.open();
+
+        axiosCustomer.get(`/customer?action=last`)
+            .then(response => {
+                if(response.data!==null){
+                    const customerList=this.state.customers;
+                    customerList.push({
+                        id:response.data.id,
+                        name:response.data.name,
+                        address:response.data.address,
+                        image:response.data.image
+                    })
+                    this.setState({
+                        customers:customerList
+                    })
+                    this.props.done();
+                }
+            })
+
+            .catch(error => {
+                this.props.error();
+                console.log("error: " + error)
+            });
+    }
+
+    componentDidMount(){
+
+        this.loadCards(0);
+        document.getElementById('result').style.display='none';
+
+    }
+
+    scrollOnCard=()=>{
+        let scrolledValue=document.getElementById('cardDiv').scrollTop;
+        let pageNo=Math.round((scrolledValue/300));
+
+        if(pageNo>this.state.pages){
+
+            this.loadCards(pageNo);
+            this.setState({
+                pages:pageNo
+            })
+        }
+        this.setState({
+            currentPage:pageNo
+        })
+
+    }
+
     // save customer function
 
     saveCustomer=()=>{
 
+        if(this.state.beforeSearch!==''){
+            this.removeBorder(this.state.beforeSearch);
+        }
+
+        this.props.open();
         const bodyFormData=new FormData();
         bodyFormData.set("file",this.props.imgFile[0].originFileObj);
 
@@ -84,21 +183,70 @@ class CustomerForm extends Component{
                                     name:'',
                                     address:''
                                 })
+                                this.loadLastCard();
+
                             }else{
-                                alert("fail!");
+                                this.props.error();
                             }
                         })
 
                         .catch(error => {
+                            this.props.error();
                             console.log("error: " + error)
                         });
                 }
             })
 
             .catch(error => {
+                this.props.error();
                 console.log("error: " + error)
             });
 
+    }
+
+    searchTyping=(text)=>{
+        document.getElementById('result').style.display='none';
+        this.setState({
+            searchText:text
+        })
+    }
+
+    removeBorder=(cardId)=>{
+        document.getElementById(cardId).style.border='0px solid black';
+    }
+
+    addBorder=(cardId)=>{
+        document.getElementById(cardId).style.border='3px solid blue';
+    }
+
+    searchCustomer=()=>{
+        if(this.state.beforeSearch!==''){
+            const cardId=this.state.beforeSearch;
+            this.removeBorder(cardId);
+        }
+        let count=0;
+        this.state.customers.map(customer=>{
+            if(customer.name===this.state.searchText){
+                const cardId="c"+customer.id;
+                this.addBorder(cardId)
+                this.setState({
+                    beforeSearch:cardId
+                })
+                const elementName=""+customer.id;
+                Scroll.scroller.scrollTo(elementName, {
+                    duration: 1000,
+                    smooth: true,
+                    containerId: 'cardDiv',
+                    offset: -120
+                })
+
+            }else{
+                count++;
+            }
+        })
+        if(count===this.state.customers.length){
+            document.getElementById('result').style.display='block';
+        }
     }
 
     render(){
@@ -110,42 +258,46 @@ class CustomerForm extends Component{
             count++;
             if(this.state.customers.length===count){
                 return(
-                    <div key={index} style={{marginTop:'2%',marginBottom:'2%'}} className="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
-                        <div className="w3-card-4" style={{width:'90%',marginLeft:'6%'}}>
-                            <img width="100%" src="https://www.w3schools.com/w3css/img_snowtops.jpg" alt="Norway"/>
-                            <div style={{display:'flex',flexDirection:'column',justifyContent:'flex-start'}} className="w3-container w3-center">
-                                <p style={{fontWeight:'bold'}}>{customer.name}</p>
-                                <p style={{fontSize:'12px'}}>{customer.address}</p>
-                                <div className={classes.ButtonRow}>
-                                    <Button onClick={this.showModal} style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
-                                        update
-                                    </Button>
-                                    <Button style={{border:'none',outline:'none',fontWeight:'bold'}} color="secondary" className={styles.button}>
-                                        Delete
-                                    </Button>
+                    <div key={index} style={{marginTop:'2%',marginBottom:'2%'}} className="col-12 col-sm-4 col-md-4 col-lg-3 col-xl-3">
+                        <Scroll.Element name={""+customer.id}>
+                            <div id={"c"+customer.id} className="w3-card-4" style={{width:'90%',marginLeft:'6%'}}>
+                                <img width="100%" height="130px" src={globalImagePath+""+customer.image} alt={customer.name}/>
+                                <div style={{display:'flex',flexDirection:'column',justifyContent:'flex-start'}} className="w3-container w3-center">
+                                    <p style={{fontWeight:'bold',fontSize:'13px'}}>{customer.name}</p>
+                                    <p style={{fontSize:'12px'}}>{customer.address}</p>
+                                    <div className={classes.ButtonRow}>
+                                        <Button onClick={this.showModal} style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
+                                            update
+                                        </Button>
+                                        <Button style={{border:'none',outline:'none',fontWeight:'bold'}} color="secondary" className={styles.button}>
+                                            Delete
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </Scroll.Element>
                     </div>
                 )
             }else{
                 return(
-                    <div key={index} style={{marginTop:'2%'}} className="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
-                        <div className="w3-card-4" style={{width:'90%',marginLeft:'6%'}}>
-                            <img width="100%" src="https://www.w3schools.com/w3css/img_snowtops.jpg" alt="Norway"/>
-                            <div style={{display:'flex',flexDirection:'column',justifyContent:'flex-start'}} className="w3-container w3-center">
-                                <p style={{fontWeight:'bold'}}>{customer.name}</p>
-                                <p style={{fontSize:'12px'}}>{customer.address}</p>
-                                <div className={classes.ButtonRow}>
-                                    <Button onClick={this.showModal} style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
-                                        update
-                                    </Button>
-                                    <Button style={{border:'none',outline:'none',fontWeight:'bold'}} color="secondary" className={styles.button}>
-                                        Delete
-                                    </Button>
+                    <div key={index} style={{marginTop:'2%'}} className="col-12 col-sm-4 col-md-4 col-lg-3 col-xl-3">
+                        <Scroll.Element name={""+customer.id}>
+                            <div id={"c"+customer.id} className="w3-card-4" style={{width:'90%',marginLeft:'6%'}}>
+                                <img width="100%" height="130px" src={globalImagePath+""+customer.image} alt={customer.name}/>
+                                <div style={{display:'flex',flexDirection:'column',justifyContent:'flex-start'}} className="w3-container w3-center">
+                                    <p style={{fontWeight:'bold',fontSize:'13px'}}>{customer.name}</p>
+                                    <p style={{fontSize:'12px'}}>{customer.address}</p>
+                                    <div className={classes.ButtonRow}>
+                                        <Button onClick={this.showModal} style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
+                                            update
+                                        </Button>
+                                        <Button style={{border:'none',outline:'none',fontWeight:'bold'}} color="secondary" className={styles.button}>
+                                            Delete
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </Scroll.Element>
                     </div>
                 )
             }
@@ -238,12 +390,13 @@ class CustomerForm extends Component{
                                         <div className={classes.AddName}>
 
                                             <div>Name</div>
-                                            <div><input type="text"/></div>
+                                            <div><input value={this.state.searchText} onChange={(event)=>{this.searchTyping(event.target.value)}} type="text"/></div>
+                                            <div id="result" style={{color:'red'}}>No Result Found!</div>
 
                                         </div>
 
                                         <div className={classes.saveDiv}>
-                                            <Button style={{border:'none',outline:'none'}} color="primary" className={styles.button}>
+                                            <Button id="searchBtn" onClick={this.searchCustomer} style={{border:'none',outline:'none'}} color="primary" className={styles.button}>
                                                 Search Customer
                                             </Button>
 
@@ -256,7 +409,7 @@ class CustomerForm extends Component{
                         </div>
                     </div>
                     <div className="col-12 col-sm-12 col-md-8 col-lg-8 col-xl-8">
-                        <div className={classes.Cards}>
+                        <div id="cardDiv" onScroll={this.scrollOnCard} className={classes.Cards}>
                             {cardSet}
                         </div>
                     </div>
@@ -275,6 +428,12 @@ const mapStateToProps=(state)=>{
 const mapDispatchToProps=(dispatch)=>{
     return{
         onHandleImageFiles:(data)=>dispatch(actionCreators.uploadImageOnAction(data)),
+
+        open:()=>dispatch(actionCreators.loaderOpen()),
+        close:()=>dispatch(actionCreators.loaderClose()),
+        load:()=>dispatch(actionCreators.loaderLoad()),
+        done:()=>dispatch(actionCreators.loaderDone()),
+        error:()=>dispatch(actionCreators.loaderError()),
     }
 }
 

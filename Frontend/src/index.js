@@ -9,10 +9,12 @@ import {BrowserRouter} from "react-router-dom";
 
 import NavbarReducer from './store/reducers/NavbarReducer';
 import UploadeReducer from './store/reducers/UploadReducer';
+import LoaderReducer from './store/reducers/LoaderReducer';
 
 const rootReducer=combineReducers({
     navbarRed:NavbarReducer,
-    uploadRed:UploadeReducer
+    uploadRed:UploadeReducer,
+    loaderRed:LoaderReducer
 });
 
 // make the compose enhacers for redux devtools
