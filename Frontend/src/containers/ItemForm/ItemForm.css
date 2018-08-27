@@ -38,7 +38,7 @@
     border-radius: 4px;
 }
 
-.AddAddress{
+.AddPrice{
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
@@ -52,12 +52,42 @@
     margin-top: 1%;
 }
 
-.AddAddress input{
+.AddPrice input{
     border:1px solid gray;
     background-color: lightgray;
     outline:none;
     border-radius: 4px;
-    margin-left: -4%;
+    margin-left: 1%;
+}
+
+.AddAmount{
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-top: 1%;
+}
+
+.AddAmount input{
+    border:1px solid gray;
+    background-color: lightgray;
+    outline:none;
+    border-radius: 4px;
+    margin-left: -3%;
+}
+
+.AddUnit{
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-top: 1%;
+}
+
+.AddUnit input{
+    border:1px solid gray;
+    background-color: lightgray;
+    outline:none;
+    border-radius: 4px;
+    margin-left: 2%;
 }
 
 .saveDiv{

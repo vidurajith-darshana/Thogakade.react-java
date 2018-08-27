@@ -25,5 +25,8 @@ public class WebAppConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/images/customer/**").addResourceLocations("/WEB-INF/images/customer/")
                 .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic());
 
+        registry.addResourceHandler("/images/item/**").addResourceLocations("/WEB-INF/images/item/")
+                .setCacheControl(CacheControl.maxAge(2, TimeUnit.HOURS).cachePublic());
+
     }
 }
