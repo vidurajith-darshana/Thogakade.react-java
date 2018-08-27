@@ -1,0 +1,12 @@
+.Container{
+    width:100%;
+    height: 500px;
+}
+.Add{
+    width: 100%;
+    background-color: white;
+    border-radius: 5px;
+    border:1px solid lightgray;
+    box-shadow: 1px 1px 1px lightgray;
+}
+

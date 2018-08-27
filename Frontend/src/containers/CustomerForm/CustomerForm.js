@@ -33,16 +33,28 @@ class CustomerForm extends Component{
         address:'',
         searchText:'',
         pages:0,
-        beforeSearch:''
+        beforeSearch:'',
+
+        updatedId:'',
+        updatedAddress:'',
+        updatedName:'',
+        updatedImage:'',
+        beforeCustomer:''
     }
 
-    showModal = (url) => {
-        this.getBase64Image(url, (base64image)=>{
-            console.log(base64image);
-        });
+    showModal = (url,customerObj) => {
+        // this.getBase64Image(url, (base64image)=>{
+        //     console.log(base64image);
+        // });
         this.setState({
             visible: true,
+            updatedId:customerObj.id,
+            updatedAddress:customerObj.address,
+            updatedName:customerObj.name,
+            updatedImage:customerObj.image,
+            beforeCustomer:customerObj
         });
+        this.props.onHandleImageFiles([]);
     }
 
     handleOk = (e) => {
@@ -192,7 +204,7 @@ class CustomerForm extends Component{
 
     deleteCustomer=(customerObj)=>{
         this.props.open();
-        
+
         axiosCustomer.delete(`/customer`,{data:customerObj})
             .then(response => {
                 if(response.data){
@@ -211,6 +223,107 @@ class CustomerForm extends Component{
                 this.props.error();
                 console.log("error: " + error)
             });
+    }
+
+    updateCustomer=()=>{
+        this.props.open();
+        console.log(this.props.imgFile)
+        if(this.props.imgFile.length>0){
+
+            this.props.open();
+            const bodyFormData=new FormData();
+            bodyFormData.set("file",this.props.imgFile[0].originFileObj);
+
+            axiosUpload.post(`/customer`,bodyFormData)
+                .then(response => {
+                    if(response.data.StatusCode!==500){
+                        const customerObj={
+                            id:this.state.updatedId,
+                            name:this.state.updatedName,
+                            address:this.state.updatedAddress,
+                            image:response.data
+                        }
+                        axiosCustomer.post(`/customer`,customerObj)
+                            .then(response => {
+                                if(response.data){
+                                    const customerList=this.state.customers;
+                                    customerList.splice(customerList.indexOf(this.state.beforeCustomer),1);
+                                    customerList.push(customerObj);
+                                    this.setState({
+                                        customers:customerList,
+                                        visible:false
+                                    })
+                                    this.props.done();
+                                    const elementName=""+this.state.updatedId;
+                                    Scroll.scroller.scrollTo(elementName, {
+                                        duration: 1000,
+                                        smooth: true,
+                                        containerId: 'cardDiv',
+                                        offset: -120
+                                    })
+                                    this.props.onHandleImageFiles([]);
+
+                                }else{
+                                    this.props.error();
+
+                                }
+                            })
+
+                            .catch(error => {
+                                this.props.error();
+                                console.log("error: " + error)
+                            });
+                    }
+                })
+
+                .catch(error => {
+                    this.props.error();
+                    console.log("error: " + error)
+                });
+
+        }else{
+            const customerObj={
+                id:this.state.updatedId,
+                name:this.state.updatedName,
+                address:this.state.updatedAddress,
+                image:this.state.updatedImage
+            }
+            axiosCustomer.post(`/customer`,customerObj)
+                .then(response => {
+                    if(response.data){
+                        const customerList=this.state.customers;
+                        customerList.splice(customerList.indexOf(this.state.beforeCustomer),1);
+                        customerList.push(customerObj);
+                        this.setState({
+                            customers:customerList,
+                            visible:false
+                        })
+                        this.props.done();
+                        const elementName=""+this.state.updatedId;
+                        Scroll.scroller.scrollTo(elementName, {
+                            duration: 1000,
+                            smooth: true,
+                            containerId: 'cardDiv',
+                            offset: -120
+                        })
+                    }else{
+                        this.setState({
+                            visible:false
+                        })
+                        this.props.error();
+                    }
+                })
+
+                .catch(error => {
+                    this.setState({
+                        visible:false
+                    })
+                    this.props.error();
+                    console.log("error: " + error)
+                });
+        }
+
+
     }
 
     // save customer function
@@ -325,7 +438,7 @@ class CustomerForm extends Component{
                                     <p style={{fontWeight:'bold',fontSize:'13px'}}>{customer.name}</p>
                                     <p style={{fontSize:'12px'}}>{customer.address}</p>
                                     <div className={classes.ButtonRow}>
-                                        <Button onClick={()=>this.showModal(globalImagePath+""+customer.image)} style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
+                                        <Button onClick={()=>this.showModal(globalImagePath+""+customer.image,customer)} style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
                                             update
                                         </Button>
                                         <Button onClick={()=>this.deleteCustomer(customer)} style={{border:'none',outline:'none',fontWeight:'bold'}} color="secondary" className={styles.button}>
@@ -347,7 +460,7 @@ class CustomerForm extends Component{
                                     <p style={{fontWeight:'bold',fontSize:'13px'}}>{customer.name}</p>
                                     <p style={{fontSize:'12px'}}>{customer.address}</p>
                                     <div className={classes.ButtonRow}>
-                                        <Button onClick={()=>this.showModal(globalImagePath+""+customer.image)} style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
+                                        <Button onClick={()=>this.showModal(globalImagePath+""+customer.image,customer)} style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
                                             update
                                         </Button>
                                         <Button onClick={()=>this.deleteCustomer(customer)} style={{border:'none',outline:'none',fontWeight:'bold'}} color="secondary" className={styles.button}>
@@ -380,19 +493,19 @@ class CustomerForm extends Component{
             <div className={classes.AddName}>
 
                 <div>Name</div>
-                <div><input type="text" style={{marginLeft:'-2%'}}/></div>
+                <div><input value={this.state.updatedName} onChange={(event)=>this.setState({updatedName:event.target.value})} type="text" style={{marginLeft:'-2%'}}/></div>
 
             </div>
 
             <div className={classes.AddAddress}>
 
                 <div>Address</div>
-                <div><input type="text"/></div>
+                <div><input value={this.state.updatedAddress} onChange={(event)=>this.setState({updatedAddress:event.target.value})} type="text"/></div>
 
             </div>
 
             <div className={classes.updateDiv}>
-                <Button style={{border:'none',outline:'none'}} color="primary" className={styles.button}>
+                <Button onClick={()=>this.updateCustomer()} style={{border:'none',outline:'none'}} color="primary" className={styles.button}>
                     Update Customer
                 </Button>
 
