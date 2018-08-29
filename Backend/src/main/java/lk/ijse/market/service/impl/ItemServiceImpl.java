@@ -19,7 +19,7 @@ import java.util.List;
 public class ItemServiceImpl implements ItemService {
 
     @Autowired
-    ItemRepository itemRepository;
+    private ItemRepository itemRepository;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)

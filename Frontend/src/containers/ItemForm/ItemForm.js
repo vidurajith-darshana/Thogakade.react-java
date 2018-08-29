@@ -455,7 +455,7 @@ class ItemForm extends Component{
                                 <img width="100%" height="130px" src={globalImagePath+""+item.image} alt={item.name}/>
                                 <div style={{display:'flex',flexDirection:'column',justifyContent:'flex-start'}} className="w3-container w3-center">
                                     <p style={{fontWeight:'bold',fontSize:'13px'}}>{item.name}</p>
-                                    <p style={{fontSize:'12px'}}>{item.price}</p>
+                                    <p style={{fontSize:'12px'}}>{"RS "+item.price}</p>
                                     <p style={{fontSize:'12px'}}>{item.amount+""+item.unit}</p>
                                     <div className={classes.ButtonRow}>
                                         <Button onClick={()=>this.showModal(globalImagePath+""+item.image,item)} style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>
@@ -478,7 +478,7 @@ class ItemForm extends Component{
                                 <img width="100%" height="130px" src={globalImagePath+""+item.image} alt={item.name}/>
                                 <div style={{display:'flex',flexDirection:'column',justifyContent:'flex-start'}} className="w3-container w3-center">
                                     <p style={{fontWeight:'bold',fontSize:'13px'}}>{item.name}</p>
-                                    <p style={{fontSize:'12px'}}>{item.price}</p>
+                                    <p style={{fontSize:'12px'}}>{"RS "+item.price}</p>
                                     <p style={{fontSize:'12px'}}>{item.amount+""+item.unit}</p>
                                     <div className={classes.ButtonRow}>
                                         <Button onClick={()=>this.showModal(globalImagePath+""+item.image,item)} style={{border:'none',outline:'none',fontWeight:'bold'}} color="primary" className={styles.button}>

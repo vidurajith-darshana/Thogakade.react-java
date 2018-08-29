@@ -9,6 +9,7 @@ import Button from "@material-ui/core/Button/Button";
 import ScrollableTable from '../../components/ScrollableTable/ScrollableTable';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
+import {Modal} from 'antd';
 
 const styles = theme => ({
     button: {
@@ -34,12 +35,13 @@ class PlaceOrderForm extends Component{
         itemPages:0,
         customerPages:0,
 
-        selectItemId:'1',
-        selectCustomerName:'Kamla Perera',
-        selectItemName:'Cabbage',
-        selectItemPrice:'123.00',
-        selectItemAmount:'23',
-        selectItemUnit:'Kg',
+        selectItemId:'',
+        selectCustomerName:'',
+        selectItemName:'',
+        selectItemPrice:'',
+        selectItemAmount:'',
+        selectItemUnit:'',
+        totalPrice:'0.00',
 
         tableBody:[]
 
@@ -201,52 +203,159 @@ class PlaceOrderForm extends Component{
         })
     }
 
+    countTotalPrice=()=>{
+        let totalPrice=0;
+        this.state.tableBody.map(tr=>{
+            totalPrice+=tr.totalPerItem
+        })
+        this.setState({
+            totalPrice
+        })
+    }
+
     upItemAmount=(id)=>{
 
-        this.state.tableBody.map(tr=>{
-            if(tr.itemId===id){
-                const newItemAmount=tr.itemAmount+1;
-                this.state.items.map(item=>{
-                    if(item.id===id && item.itemAmount<newItemAmount){
-                        document.getElementById('addBtn').disabled=true;
-                    }else if(item.id===id){
-                        const index=this.state.tableBody.indexOf(tr);
-                        this.state.tableBody[index].itemAmount=newItemAmount;
-                        this.setState({
+        const orderDetails=this.state.tableBody;
+        this.state.items.map(item=>{
+            orderDetails.map(detail=>{
+                if(detail.itemId===item.id && item.id===id && item.amount>detail.itemAmount){
+                    detail.itemAmount=detail.itemAmount+1;
+                    detail.totalPerItem=detail.itemPrice*detail.itemAmount;
+                    this.countTotalPrice();
+                }else if(detail.itemId===item.id && item.id===id){
+                    const btnId="addBtn"+id;
+                    document.getElementById(btnId).disabled=true;
+                    document.getElementById(btnId).style.cursor='default';
+                }
+            })
+        })
+        this.setState({
+            tableBody:orderDetails
+        })
+    }
 
-                        })
-                    }
-                })
-            }
+    downItemAmount=(id)=>{
+
+        const btnId="addBtn"+id;
+        document.getElementById(btnId).disabled=false;
+        document.getElementById(btnId).style.cursor='pointer';
+
+        const orderDetails=this.state.tableBody;
+        this.state.items.map(item=>{
+            orderDetails.map(detail=>{
+                if(detail.itemId===item.id && item.id===id && detail.itemAmount>1){
+                    detail.itemAmount=detail.itemAmount-1;
+                    detail.totalPerItem=detail.itemPrice*detail.itemAmount;
+                    this.countTotalPrice();
+                }else if(detail.itemId===item.id && item.id===id){
+                    orderDetails.splice(orderDetails.indexOf(this),1);
+                    this.countTotalPrice();
+                }
+            })
+        })
+        this.setState({
+            tableBody:orderDetails
         })
     }
 
     addToCart=(id)=>{
 
-        const buttonRow=<div style={{display:'flex',justifyContent:'center'}}>
-            <Button id="addBtn" onClick={()=>this.upItemAmount(id)} style={{outline:'none',border:'none'}} variant="fab" mini color="primary" aria-label="Add" className={styles.button}>
-                <AddIcon />
-            </Button>
-            &nbsp;
-            &nbsp;
-            &nbsp;
-            <Button id="removeBtn" style={{outline:'none',border:'none'}}  variant="fab" mini color="secondary" aria-label="Delete" className={styles.button}>
-                <RemoveIcon />
-            </Button>
-        </div>
+        if(this.state.selectItemId!==''){
+            const orderDetail=this.state.tableBody;
+            orderDetail.push({
+                itemId:this.state.selectItemId,
+                itemName:this.state.selectItemName,
+                itemPrice:this.state.selectItemPrice,
+                itemAmount:1,
+                totalPerItem:this.state.selectItemPrice,
 
-        const orderDetail=this.state.tableBody;
-        orderDetail.push({
-            itemId:this.state.selectItemId,
-            itemName:this.state.selectItemName,
-            itemPrice:this.state.selectItemPrice,
-            itemAmount:1,
-            totalPerItem:this.state.selectItemPrice*this.state.selectItemAmount,
-            "":buttonRow
+                buttonRow:<div style={{display:'flex',justifyContent:'center'}}>
+                    <Button id={"addBtn"+this.state.selectItemId} onClick={()=>this.upItemAmount(id)} style={{outline:'none',border:'none'}} variant="fab" mini color="primary" aria-label="Add" className={styles.button}>
+                        <AddIcon />
+                    </Button>
+                    &nbsp;
+                    &nbsp;
+                    &nbsp;
+                    <Button id={"removeBtn"+this.state.selectItemId} onClick={()=>this.downItemAmount(id)} style={{outline:'none',border:'none'}}  variant="fab" mini color="secondary" aria-label="Delete" className={styles.button}>
+                        <RemoveIcon />
+                    </Button>
+                </div>
+            })
+
+            this.setState({
+                tableBody:orderDetail,
+                selectItemId:'',
+                selectItemName:'',
+                selectItemPrice:'',
+                selectItemAmount:'',
+                selectItemUnit:'',
+            })
+
+            this.countTotalPrice();
+        }else{
+            this.warningCartMsg()
+        }
+    }
+
+    warningMsg=()=> {
+        Modal.warning({
+            title: 'Ooops',
+            content: 'Item Already Added...',
+        });
+    }
+
+    warningCartMsg=()=> {
+        Modal.warning({
+            title: 'Ooops',
+            content: 'Item Not Selected...',
+        });
+    }
+
+    errorMsg=()=>{
+        Modal.error({
+            title: 'Error',
+            content: 'You must Select items before Order!',
+        });
+    }
+
+
+    clickOnItemCard=(item)=>{
+        let count=0;
+        this.state.tableBody.map(tr=>{
+            if(tr.itemId===item.id){
+                count++;
+            }
         })
+        if(count===0){
+            this.setState({
+                selectItemId:item.id,
+                selectItemName:item.name,
+                selectItemPrice:item.price,
+                selectItemAmount:item.amount,
+                selectItemUnit:item.unit
+            })
+        }else{
+            this.warningMsg();
+        }
+    }
+
+
+    clickOnCustomerCard=(customer)=>{
         this.setState({
-            tableBody:orderDetail
+            selectCustomerName:customer.name
         })
+    }
+
+    orderGoods=()=>{
+        if(this.state.tableBody.length>0){
+            console.log("ok");
+            this.setState({
+                tableBody:[],
+                totalPrice:'0.00'
+            })
+        }else{
+            this.errorMsg();
+        }
     }
 
     render(){
@@ -256,10 +365,12 @@ class PlaceOrderForm extends Component{
 
         const itemCards=this.state.items.map((item,index)=>{
             return(
-                <div key={index} className="w3-card-4" style={{marginLeft:'1%',width:'105px',height:'100px'}}>
-                    <img width="105px" height='80px' src={globalItemImagePath+""+item.image} alt="Norway" />
-                    <div className="w3-container w3-center">
-                        <p style={{fontSize:'10px'}}>{item.name}</p>
+                <div key={index} className={classes.Item} onClick={()=>this.clickOnItemCard(item)}>
+                    <div className="w3-card-4">
+                        <img width="105px" height='80px' src={globalItemImagePath+""+item.image} alt="Norway" />
+                        <div className="w3-container w3-center">
+                            <p style={{fontSize:'10px'}}>{item.name}</p>
+                        </div>
                     </div>
                 </div>
             )
@@ -267,7 +378,7 @@ class PlaceOrderForm extends Component{
 
         const customerCards=this.state.customers.map((customer,index)=>{
             return(
-                <Scroll.Element style={{marginTop:'2%',marginLeft:'1%'}} key={index} name={""+customer.id}>
+                <Scroll.Element className={classes.Customer} onClick={()=>this.clickOnCustomerCard(customer)} key={index} name={""+customer.id}>
                     <div>
                         <div style={{width:'130px'}} className="w3-card-4">
                             <img width="130px" height="100px" src={globalCustomerImagePath+""+customer.image} alt="Norway"/>
@@ -290,7 +401,7 @@ class PlaceOrderForm extends Component{
                                 <div className="w3-panel w3-card-2" style={{marginLeft:'1%'}}>
                                     <div className={classes.SearchItems}>
                                         <h5>Search Item</h5>
-                                        <input value={this.state.searchItemText} onChange={(event)=>this.searchTypingItem(event.target.value)} type="text" />
+                                        <input value={this.state.searchItemText} type="text" />
                                     </div>
                                 </div>
                             </div>
@@ -332,7 +443,7 @@ class PlaceOrderForm extends Component{
                                     </div>
 
                                     <div style={{display:'flex',justifyContent:'space-between'}}>
-                                        <p>Item Price:</p>
+                                        <p>Item Price (RS):</p>
                                         <p style={{fontWeight:'bold'}}>{this.state.selectItemPrice}</p>
                                     </div>
 
@@ -360,10 +471,10 @@ class PlaceOrderForm extends Component{
                                 <div style={{marginTop:'2%',display:'flex',justifyContent:'center'}}>
                                     <p>Total Price:</p>
                                     &nbsp;
-                                    <p></p>
+                                    <p>{this.state.totalPrice}</p>
                                     &nbsp;
                                     &nbsp;
-                                    <Button style={{border:'1px solid orange',outline:'none',fontWeight:'bold',fontSize:'18px'}} color="primary" className={styles.button}>
+                                    <Button onClick={this.orderGoods} style={{border:'1px solid orange',outline:'none',fontWeight:'bold',fontSize:'18px'}} color="primary" className={styles.button}>
                                         Order
                                     </Button>
                                 </div>
