@@ -1,30 +1,31 @@
 package lk.ijse.market.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int oid;
 
     @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private String Customer;
+    private Customer customer;
+
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    List<OrderDetail> orderDetailList;
 
     private double totalPrice;
 
     public Order() {
     }
 
-    public Order(int id) {
-        this.oid=id;
-    }
-
-    public Order(int oid,String customer, double totalPrice) {
+    public Order(int oid,Customer customer, List<OrderDetail> orderDetailList, double totalPrice) {
         this.oid=oid;
-        Customer = customer;
+        this.customer = customer;
+        this.orderDetailList = orderDetailList;
         this.totalPrice = totalPrice;
     }
 
@@ -36,12 +37,20 @@ public class Order {
         this.oid = oid;
     }
 
-    public String getCustomer() {
-        return Customer;
+    public Customer getCustomer() {
+        return customer;
     }
 
-    public void setCustomer(String customer) {
-        Customer = customer;
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public List<OrderDetail> getOrderDetailList() {
+        return orderDetailList;
+    }
+
+    public void setOrderDetailList(List<OrderDetail> orderDetailList) {
+        this.orderDetailList = orderDetailList;
     }
 
     public double getTotalPrice() {
@@ -56,7 +65,8 @@ public class Order {
     public String toString() {
         return "Order{" +
                 "oid=" + oid +
-                ", Customer='" + Customer + '\'' +
+                ", customer=" + customer +
+                ", orderDetailList=" + orderDetailList +
                 ", totalPrice=" + totalPrice +
                 '}';
     }

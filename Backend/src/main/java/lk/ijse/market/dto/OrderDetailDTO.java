@@ -2,63 +2,17 @@ package lk.ijse.market.dto;
 
 public class OrderDetailDTO {
 
-    private int orderId;
-    private String itemName;
-    private String customerName;
-    private double itemPrice;
-    private int qty;
     private double totalPricePerItem;
+    private int qty;
+    private ItemDTO item;
 
     public OrderDetailDTO() {
     }
 
-    public OrderDetailDTO(int orderId, String itemName, String customerName, double itemPrice, int qty, double totalPricePerItem) {
-        this.orderId = orderId;
-        this.itemName = itemName;
-        this.customerName = customerName;
-        this.itemPrice = itemPrice;
-        this.qty = qty;
+    public OrderDetailDTO(double totalPricePerItem, int qty, ItemDTO item) {
         this.totalPricePerItem = totalPricePerItem;
-    }
-
-    public int getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(int orderId) {
-        this.orderId = orderId;
-    }
-
-    public String getItemName() {
-        return itemName;
-    }
-
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
-    }
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
-    }
-
-    public double getItemPrice() {
-        return itemPrice;
-    }
-
-    public void setItemPrice(double itemPrice) {
-        this.itemPrice = itemPrice;
-    }
-
-    public int getQty() {
-        return qty;
-    }
-
-    public void setQty(int qty) {
         this.qty = qty;
+        this.item = item;
     }
 
     public double getTotalPricePerItem() {
@@ -69,15 +23,29 @@ public class OrderDetailDTO {
         this.totalPricePerItem = totalPricePerItem;
     }
 
+    public int getQty() {
+        return qty;
+    }
+
+    public void setQty(int qty) {
+        this.qty = qty;
+    }
+
+    public ItemDTO getItem() {
+        return item;
+    }
+
+    public void setItem(ItemDTO item) {
+        this.item = item;
+    }
+
+
     @Override
     public String toString() {
         return "OrderDetailDTO{" +
-                "orderId=" + orderId +
-                ", itemName='" + itemName + '\'' +
-                ", customerName='" + customerName + '\'' +
-                ", itemPrice=" + itemPrice +
+                "totalPricePerItem=" + totalPricePerItem +
                 ", qty=" + qty +
-                ", totalPricePerItem=" + totalPricePerItem +
+                ", item=" + item +
                 '}';
     }
 }

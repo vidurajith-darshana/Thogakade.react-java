@@ -27,10 +27,6 @@ public class Item {
     public Item() {
     }
 
-    public Item(int id) {
-        this.id=id;
-    }
-
     public int getId() {
         return id;
     }

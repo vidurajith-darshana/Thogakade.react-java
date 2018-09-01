@@ -1,18 +1,23 @@
 package lk.ijse.market.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class OrderDTO {
 
     private int oid;
-    private String cid;
     private double totalPrice;
+    private CustomerDTO customerDTO;
+    private List<OrderDetailDTO>orderDetailDTOList;
 
     public OrderDTO() {
     }
 
-    public OrderDTO(int oid, String cid, double totalPrice) {
+    public OrderDTO(int oid, double totalPrice, CustomerDTO customerDTO, List<OrderDetailDTO> orderDetailDTOList) {
         this.oid = oid;
-        this.cid = cid;
         this.totalPrice = totalPrice;
+        this.customerDTO = customerDTO;
+        this.orderDetailDTOList = orderDetailDTOList;
     }
 
     public int getOid() {
@@ -23,14 +28,6 @@ public class OrderDTO {
         this.oid = oid;
     }
 
-    public String getCid() {
-        return cid;
-    }
-
-    public void setCid(String cid) {
-        this.cid = cid;
-    }
-
     public double getTotalPrice() {
         return totalPrice;
     }
@@ -39,12 +36,19 @@ public class OrderDTO {
         this.totalPrice = totalPrice;
     }
 
-    @Override
-    public String toString() {
-        return "OrderDTO{" +
-                "oid=" + oid +
-                ", cid='" + cid + '\'' +
-                ", totalPrice=" + totalPrice +
-                '}';
+    public CustomerDTO getCustomerDTO() {
+        return customerDTO;
+    }
+
+    public void setCustomerDTO(CustomerDTO customerDTO) {
+        this.customerDTO = customerDTO;
+    }
+
+    public List<OrderDetailDTO> getOrderDetailDTOList() {
+        return orderDetailDTOList;
+    }
+
+    public void setOrderDetailDTOList(List<OrderDetailDTO> orderDetailDTOList) {
+        this.orderDetailDTOList = orderDetailDTOList;
     }
 }

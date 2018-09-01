@@ -1,8 +1,6 @@
 package lk.ijse.market.entity;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name="orderdetail")
@@ -12,15 +10,23 @@ public class OrderDetail {
     private OrderDetailPK orderDetailPK;
 
     private double totalPricePerItem;
-    private double qty;
+    private int qty;
+
+    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private Order order;
+
+    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private Item item;
 
     public OrderDetail() {
     }
 
-    public OrderDetail(OrderDetailPK orderDetailPK, double totalPricePerItem, double qty) {
+    public OrderDetail(OrderDetailPK orderDetailPK, double totalPricePerItem, int qty, Order order, Item item) {
         this.orderDetailPK = orderDetailPK;
         this.totalPricePerItem = totalPricePerItem;
         this.qty = qty;
+        this.order = order;
+        this.item = item;
     }
 
     public OrderDetailPK getOrderDetailPK() {
@@ -39,12 +45,28 @@ public class OrderDetail {
         this.totalPricePerItem = totalPricePerItem;
     }
 
-    public double getQty() {
+    public int getQty() {
         return qty;
     }
 
-    public void setQty(double qty) {
+    public void setQty(int qty) {
         this.qty = qty;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
     }
 
     @Override
@@ -53,6 +75,8 @@ public class OrderDetail {
                 "orderDetailPK=" + orderDetailPK +
                 ", totalPricePerItem=" + totalPricePerItem +
                 ", qty=" + qty +
+                ", order=" + order +
+                ", item=" + item +
                 '}';
     }
 }

@@ -1,16 +1,13 @@
 package lk.ijse.market.controller;
 
-import lk.ijse.market.dto.CustomerDTO;
-import lk.ijse.market.dto.ItemDTO;
 import lk.ijse.market.dto.OrderDTO;
 import lk.ijse.market.service.OrderDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 @CrossOrigin
@@ -20,11 +17,40 @@ public class OrderDetailController {
     @Autowired
     private OrderDetailService orderDetailService;
 
-    public boolean saveOrderDetail(@RequestBody OrderDTO orderDTO,@RequestBody List<ItemDTO> itemList){
-        if(orderDetailService.saveOrderDetail(orderDTO,itemList)){
-            return true;
+    @PutMapping(consumes = "application/json")
+    public boolean saveOrderDetail(@RequestBody OrderDTO orderDTO){
+
+        OrderDTO lastOrder=orderDetailService.getLastOrder();
+        if(lastOrder!=null){
+            int newId=lastOrder.getOid()+1;
+            orderDTO.setOid(newId);
+            if(orderDetailService.saveOrderDetail(orderDTO)){
+                return true;
+            }else{
+                return false;
+            }
         }else{
-            return false;
+            orderDTO.setOid(1);
+            if(orderDetailService.saveOrderDetail(orderDTO)){
+                return true;
+            }else{
+                return false;
+            }
         }
+
     }
+
+    @GetMapping
+    public Object find(@RequestParam(value = "action",required = false) String action){
+        if(action!=null){
+            switch (action){
+                case "all":return orderDetailService.findAll();
+                case "last":return orderDetailService.getLastOrder();
+                default: return orderDetailService.findAll();
+            }
+        }
+        return orderDetailService.findAll();
+    }
+
+
 }

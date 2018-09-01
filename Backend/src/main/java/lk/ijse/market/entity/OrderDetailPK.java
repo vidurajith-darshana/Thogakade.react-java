@@ -1,21 +1,19 @@
 package lk.ijse.market.entity;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
+import java.io.Serializable;
 
 @Embeddable
-public class OrderDetailPK {
+public class OrderDetailPK implements Serializable {
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    private Order order;
+    private int oid;
+    private int id;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    private Item item;
+    public OrderDetailPK() {
+    }
 
-    public OrderDetailPK(Order order, Item item) {
-        this.order = order;
-        this.item = item;
+    public OrderDetailPK(int oid, int id) {
+        this.oid = oid;
+        this.id = id;
     }
 }

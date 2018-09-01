@@ -35,8 +35,12 @@ class PlaceOrderForm extends Component{
         itemPages:0,
         customerPages:0,
 
-        selectItemId:'',
         selectCustomerName:'',
+        selectCustomerId:'',
+        selectCustomerAddress:'',
+        selectCustomerImage:'',
+
+        selectItemId:'',
         selectItemName:'',
         selectItemPrice:'',
         selectItemAmount:'',
@@ -50,6 +54,7 @@ class PlaceOrderForm extends Component{
     componentDidMount(){
         this.loadItemCards(0);
         this.loadCustomerCards(0);
+        this.props.close();
     }
 
     loadCustomerCards=(pageNumber)=>{
@@ -142,7 +147,6 @@ class PlaceOrderForm extends Component{
                     this.setState({
                         items:itemList
                     })
-                    this.props.close();
                 }
             })
 
@@ -166,6 +170,7 @@ class PlaceOrderForm extends Component{
         this.setState({
             currentPage:pageNo
         })
+        this.props.close();
 
     }
 
@@ -342,17 +347,76 @@ class PlaceOrderForm extends Component{
 
     clickOnCustomerCard=(customer)=>{
         this.setState({
-            selectCustomerName:customer.name
+            selectCustomerName:customer.name,
+            selectCustomerId:customer.id,
+            selectCustomerAddress:customer.address,
+            selectCustomerImage:customer.image
         })
     }
 
     orderGoods=()=>{
         if(this.state.tableBody.length>0){
-            console.log("ok");
-            this.setState({
-                tableBody:[],
-                totalPrice:'0.00'
+            const sendItemList=[];
+            this.state.tableBody.map(tr=>{
+                this.state.items.map(item=>{
+                    if(tr.itemId===item.id){
+                        sendItemList.push(
+                            {
+                                totalPricePerItem:tr.itemAmount*tr.itemPrice,
+                                qty:tr.itemAmount,
+                                item:{
+                                    id:tr.itemId,
+                                    name:tr.itemName,
+                                    price:tr.itemPrice,
+                                    amount:tr.itemAmount,
+                                    unit:item.unit,
+                                    image:item.image
+                                }
+                            }
+                        )
+                    }
+                })
             })
+
+            this.props.open();
+            const order={
+                oid:0,
+                totalPrice:this.state.totalPrice,
+                customerDTO:{
+                    id:this.state.selectCustomerId,
+                    name:this.state.selectCustomerName,
+                    address:this.state.selectCustomerAddress,
+                    image:this.state.selectCustomerImage
+                },
+                orderDetailDTOList:sendItemList
+            }
+            axiosItem.put(`/order`,order)
+                .then(response => {
+                    if(response.data){
+                        this.setState({
+                            tableBody:[],
+                            totalPrice:0.00,
+                            selectCustomerName:'',
+                            selectItemId:'',
+                            selectItemName:'',
+                            selectItemPrice:'',
+                            selectItemAmount:'',
+                            selectItemUnit:'',
+                            items:[]
+                        })
+                        for(let i=0;i<=this.state.itemPages;i++){
+                            this.loadItemCards(i);
+                        }
+                        this.props.done();
+                    }else{
+                        this.props.error();
+                    }
+                })
+
+                .catch(error => {
+                    this.props.error();
+                    console.log("error: " + error)
+                });
         }else{
             this.errorMsg();
         }
