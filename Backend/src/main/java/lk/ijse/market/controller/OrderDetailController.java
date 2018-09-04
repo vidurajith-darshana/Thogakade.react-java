@@ -40,8 +40,15 @@ public class OrderDetailController {
 
     }
 
+    @GetMapping("/{id}")
+    public OrderDTO find(@PathVariable("id") Integer oid){
+        int id=oid==null?0:oid;
+        return orderDetailService.findById(id);
+    }
+
     @GetMapping
     public Object find(@RequestParam(value = "action",required = false) String action){
+
         if(action!=null){
             switch (action){
                 case "all":return orderDetailService.findAll();

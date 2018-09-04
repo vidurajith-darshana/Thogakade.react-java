@@ -11,4 +11,6 @@ public interface OrderDetailService {
     public List<OrderDTO> findAll();
 
     public OrderDTO getLastOrder();
+
+    public OrderDTO findById(int id);
 }

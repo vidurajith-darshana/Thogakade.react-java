@@ -106,4 +106,20 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         }
         return orderDTO;
     }
+
+    @Override
+    public OrderDTO findById(int id) {
+        OrderDTO orderDTO=null;
+        if(orderRepository.existsById(id)){
+            Order order=orderRepository.findById(id).get();
+            List<OrderDetailDTO> orderDetailDTOList=new ArrayList<>();
+            for(OrderDetail orderDetail:order.getOrderDetailList()){
+                ItemDTO itemDTO=new ItemDTO(orderDetail.getItem().getId(),orderDetail.getItem().getName(),orderDetail.getItem().getPrice(),orderDetail.getItem().getAmount(),orderDetail.getItem().getUnit(),orderDetail.getItem().getImage());
+                orderDetailDTOList.add(new OrderDetailDTO(orderDetail.getTotalPricePerItem(),orderDetail.getQty(),itemDTO));
+            }
+            CustomerDTO customerDTO=new CustomerDTO(order.getCustomer().getId(),order.getCustomer().getName(),order.getCustomer().getAddress(),order.getCustomer().getImage());
+            orderDTO=new OrderDTO(order.getOid(),order.getTotalPrice(),customerDTO,orderDetailDTOList);
+        }
+        return orderDTO;
+    }
 }
