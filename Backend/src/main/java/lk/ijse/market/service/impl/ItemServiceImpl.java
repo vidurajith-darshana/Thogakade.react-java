@@ -2,7 +2,11 @@ package lk.ijse.market.service.impl;
 
 import lk.ijse.market.dto.ItemDTO;
 import lk.ijse.market.entity.Item;
+import lk.ijse.market.entity.Order;
+import lk.ijse.market.entity.OrderDetail;
 import lk.ijse.market.repository.ItemRepository;
+import lk.ijse.market.repository.OrderDetailRepository;
+import lk.ijse.market.repository.OrderRepository;
 import lk.ijse.market.service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +24,12 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private ItemRepository itemRepository;
+
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -81,12 +91,29 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public boolean deleteItem(ItemDTO itemDTO) {
         if(itemRepository.existsById(itemDTO.getId())){
+            if(orderDetailRepository.findAll().size()>0){
+                for(OrderDetail orderDetail:orderDetailRepository.findAll()){
+                    if(orderDetail.getItem().getId()==itemDTO.getId()){
+                        Order order=orderDetail.getOrder();
+                        order.setTotalPrice(order.getTotalPrice()-orderDetail.getTotalPricePerItem());
+                        List<OrderDetail> list=new ArrayList<>();
+                        for(OrderDetail orderDetail1:order.getOrderDetailList()){
+                            if(orderDetail1.getItem().getId()!=itemDTO.getId()){
+                                list.add(orderDetail1);
+                            }
+                        }
+                        order.setOrderDetailList(list);
+                        orderRepository.save(order);
+                    }
+                }
+            }
             itemRepository.delete(new Item(itemDTO.getId(),itemDTO.getName(),itemDTO.getPrice(),itemDTO.getAmount(),itemDTO.getUnit(),itemDTO.getImage()));
             return true;
         }else{
-            throw new RuntimeException("Customer doesn't exist");
+            throw new RuntimeException("Item doesn't exist");
         }
     }
 

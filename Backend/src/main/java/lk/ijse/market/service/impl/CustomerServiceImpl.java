@@ -2,7 +2,11 @@ package lk.ijse.market.service.impl;
 
 import lk.ijse.market.dto.CustomerDTO;
 import lk.ijse.market.entity.Customer;
+import lk.ijse.market.entity.Order;
+import lk.ijse.market.entity.OrderDetail;
 import lk.ijse.market.repository.CustomerRepository;
+import lk.ijse.market.repository.OrderDetailRepository;
+import lk.ijse.market.repository.OrderRepository;
 import lk.ijse.market.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +23,12 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -85,6 +95,19 @@ public class CustomerServiceImpl implements CustomerService {
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean deleteCustomer(CustomerDTO customerDTO) {
         if(customerRepository.existsById(customerDTO.getId())){
+            if(orderRepository.findAll().size()>0){
+                for(Order order:orderRepository.findAll()){
+                    for(OrderDetail orderDetail:orderDetailRepository.findAll()){
+                        if(order.getCustomer().getId()==customerDTO.getId() && order.getOid()==orderDetail.getOrder().getOid()){
+                            orderDetailRepository.deleteFromOrderOrderDetails(orderDetail.getOrder().getOid());
+                            orderDetailRepository.delete(orderDetail);
+                        }
+                    }
+                    if(order.getCustomer().getId()==customerDTO.getId()){
+                        orderRepository.delete(order);
+                    }
+                }
+            }
             customerRepository.delete(new Customer(customerDTO.getId(),customerDTO.getName(),customerDTO.getAddress(),customerDTO.getImage()));
             return true;
         }else{
